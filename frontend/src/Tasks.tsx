@@ -76,18 +76,33 @@ function Tasks() {
             <span className="task-row-icon"><StatusIcon status={task.status} /></span>
 
             <div className="task-row-main">
-              <div className="task-row-title">{task.title}</div>
-              {task.description && <div className="task-row-desc">{task.description}</div>}
-            </div>
-
-            {isAdmin && task.assignedTo && (
-              <div className="task-row-assignee">
-                <div className="task-row-assignee-name">{task.assignedTo.name}</div>
-                {task.assignedTo.position && (
-                  <div className="task-row-assignee-position">{task.assignedTo.position}</div>
+              <div className="task-row-title-line">
+                <span className="task-row-title">{task.title}</span>
+                {isAdmin && task.assignedTo && (
+                  <span className="task-row-assignee-inline">— {task.assignedTo.name}</span>
                 )}
               </div>
-            )}
+              {task.description && <div className="task-row-desc">{task.description}</div>}
+              {isAdmin && task.assignedTo?.position && (
+                <div className="task-row-assignee-position">{task.assignedTo.position}</div>
+              )}
+            </div>
+
+            <div className="task-row-end">
+              <span className={`status-pill status-pill-${task.status}`}>{STATUS_LABELS[task.status]}</span>
+              {isAdmin ? (
+                <button className="task-delete-btn" onClick={() => handleDelete(task._id)}>Удалить</button>
+              ) : (
+                <select
+                  value={task.status}
+                  onChange={(e) => handleStatusChange(task._id, e.target.value)}
+                >
+                  <option value="todo">К выполнению</option>
+                  <option value="in_progress">В процессе</option>
+                  <option value="done">Готово</option>
+                </select>
+              )}
+            </div>
 
             <div className="task-row-end">
               {isAdmin ? (

@@ -900,21 +900,37 @@ p {
   min-width: 110px;
 }
 
-.task-row-assignee-name {
+.task-row-title-line {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.task-row-assignee-inline {
   font-size: 13px;
-  color: #333;
+  color: #388e3c;
   font-weight: 600;
 }
 
 .task-row-assignee-position {
   font-size: 11px;
   color: #999;
+  margin-top: 2px;
 }
 
 .task-row-end {
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
+.task-row-end select {
+  width: auto;
+  padding: 6px 10px;
+  font-size: 12px;
+}
 .task-row-end select {
   width: auto;
   padding: 6px 10px;
