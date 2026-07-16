@@ -72,28 +72,43 @@ function EmployeesList() {
       )}
 
       <h2 style={{ marginTop: '24px' }}>Список сотрудников</h2>
-      <ul className="employee-list">
-        {employees.map((emp) => (
-          <li key={emp._id} className="employee-card">
-            <div className="employee-name">{emp.name}</div>
-            {emp.position && <div className="employee-position">{emp.position}</div>}
-            <div className="employee-email">{emp.email}</div>
-            <div className="employee-role-row">
-              <span className={`role-pill role-${emp.role}`}>
-                {emp.role === 'admin' ? 'Администратор' : 'Сотрудник'}
-              </span>
-              {emp._id !== myId && (
-                <button
-                  className="role-switch-btn"
-                  onClick={() => handleRoleChange(emp._id, emp.role === 'admin' ? 'employee' : 'admin')}
-                >
-                  {emp.role === 'admin' ? 'Сделать сотрудником' : 'Сделать админом'}
-                </button>
-              )}
-            </div>
-          </li>
-        ))}
-      </ul>
+      <div className="employee-table-wrap">
+        <table className="employee-table">
+          <thead>
+            <tr>
+              <th>Имя</th>
+              <th>Email</th>
+              <th>Должность</th>
+              <th>Роль</th>
+              <th>Действие</th>
+            </tr>
+          </thead>
+          <tbody>
+            {employees.map((emp) => (
+              <tr key={emp._id}>
+                <td>{emp.name}</td>
+                <td>{emp.email}</td>
+                <td>{emp.position || '—'}</td>
+                <td>
+                  <span className={`role-pill role-${emp.role}`}>
+                    {emp.role === 'admin' ? 'Администратор' : 'Сотрудник'}
+                  </span>
+                </td>
+                <td>
+                  {emp._id !== myId && (
+                    <button
+                      className="role-switch-btn"
+                      onClick={() => handleRoleChange(emp._id, emp.role === 'admin' ? 'employee' : 'admin')}
+                    >
+                      {emp.role === 'admin' ? 'Сделать сотрудником' : 'Сделать админом'}
+                    </button>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

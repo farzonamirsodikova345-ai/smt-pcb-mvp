@@ -745,3 +745,42 @@ p {
   box-shadow: none;
   margin-bottom: 20px;
 }
+.employee-table-wrap {
+  background: transparent;
+  padding: 0;
+  box-shadow: none;
+  overflow-x: auto;
+}
+
+.employee-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(46, 125, 50, 0.1);
+}
+
+.employee-table th {
+  background: #66bb6a;
+  color: white;
+  text-align: left;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.employee-table td {
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #333;
+  border-bottom: 1px solid #eee;
+}
+
+.employee-table tr:last-child td {
+  border-bottom: none;
+}
+
+.employee-table tr:hover td {
+  background: #f1f8f2;
+}
