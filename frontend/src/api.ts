@@ -59,3 +59,11 @@ export const getEmployees = async (token: string) => {
   });
   return response.data;
 };
+export const updateUserRole = async (token: string, userId: string, role: string) => {
+  const response = await axios.patch(
+    `${API_URL}/auth/users/${userId}/role`,
+    { role },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+};
