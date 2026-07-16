@@ -837,3 +837,96 @@ p {
 .employee-table tr:hover td {
   background: #fafafa;
 }
+.task-row-list {
+  margin-top: 16px;
+  gap: 0;
+}
+
+.task-row {
+  background: white;
+  border-bottom: 1px solid #eee;
+  border-radius: 0;
+  padding: 12px 8px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: nowrap;
+  box-shadow: none;
+}
+
+.task-row:first-child {
+  border-top: 1px solid #eee;
+}
+
+.task-row:hover {
+  background: #fafafa;
+}
+
+.task-row-icon {
+  flex-shrink: 0;
+}
+
+.task-row-main {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  padding: 0;
+  box-shadow: none;
+}
+
+.task-row-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1b5e20;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.task-row-desc {
+  font-size: 12px;
+  color: #888;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.task-row-assignee {
+  flex-shrink: 0;
+  text-align: right;
+  background: transparent;
+  padding: 0;
+  box-shadow: none;
+  min-width: 110px;
+}
+
+.task-row-assignee-name {
+  font-size: 13px;
+  color: #333;
+  font-weight: 600;
+}
+
+.task-row-assignee-position {
+  font-size: 11px;
+  color: #999;
+}
+
+.task-row-end {
+  flex-shrink: 0;
+}
+
+.task-row-end select {
+  width: auto;
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+.task-delete-btn {
+  background: #ef5350;
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.task-delete-btn:hover {
+  background: #e53935;
+}
