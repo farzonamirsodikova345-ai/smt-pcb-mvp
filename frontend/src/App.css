@@ -60,6 +60,8 @@ input, select {
   font-size: 14px;
   width: 100%;
   background: white;
+  color: #222;
+  color-scheme: light;
 }
 
 input:focus, select:focus {
