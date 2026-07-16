@@ -40,7 +40,6 @@ function Layout({ children }: { children: React.ReactNode }) {
             <button onClick={() => go('/tasks')}>Список задач</button>
             {isAdmin && <button onClick={() => go('/create-task')}>Составить задачу</button>}
             {isAdmin && <button onClick={() => go('/employees')}>Список сотрудников</button>}
-            {isAdmin && <button onClick={() => go('/add-employee')}>Добавить сотрудника</button>}
             <button onClick={() => go('/checklists')}>Чек-листы</button>
           </div>
         )}

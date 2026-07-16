@@ -7,7 +7,6 @@ import CreateTask from './CreateTask';
 import Home from './Home';
 import Checklists from './CheckLists';
 import EmployeesList from './EmployeesList';
-import AddEmployeePage from './AddEmployeePage';
 import Layout from './Layout';
 import logo from './assets/images.png';
 import './App.css';
@@ -115,18 +114,7 @@ function App() {
           )
         }
       />
-      <Route
-        path="/add-employee"
-        element={
-          isLoggedIn && isAdmin ? (
-            <Layout>
-              <AddEmployeePage />
-            </Layout>
-          ) : (
-            <Navigate to="/" />
-          )
-        }
-      />
+      
       <Route
         path="/checklists"
         element={
