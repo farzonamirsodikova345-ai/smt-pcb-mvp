@@ -784,3 +784,56 @@ p {
 .employee-table tr:hover td {
   background: #f1f8f2;
 }
+.employee-table-wrap {
+  background: transparent;
+  padding: 0;
+  box-shadow: none;
+  overflow-x: auto;
+}
+
+.employee-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(46, 125, 50, 0.1);
+  border: 1px solid #e0e0e0;
+}
+
+.employee-table th {
+  background: #fafafa;
+  color: #444;
+  text-align: left;
+  padding: 12px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.employee-table td {
+  padding: 12px 16px;
+  font-size: 13px;
+  color: #333;
+  border-bottom: 1px solid #eee;
+  border-right: 1px solid #f0f0f0;
+}
+
+.employee-table th:not(:last-child) {
+  border-right: 1px solid #eee;
+}
+
+.employee-table td:last-child,
+.employee-table th:last-child {
+  border-right: none;
+}
+
+.employee-table tr:last-child td {
+  border-bottom: none;
+}
+
+.employee-table tr:hover td {
+  background: #fafafa;
+}
