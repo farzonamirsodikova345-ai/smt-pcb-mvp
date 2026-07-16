@@ -61,7 +61,7 @@ router.get('/users/list', authMiddleware, async (req, res) => {
       return res.status(403).json({ message: 'Доступ запрещён' });
     }
     const User = require('../models/User');
-    const users = await User.find({ role: 'employee' }, 'name email');
+    const users = await User.find({}, 'name email position role');
     res.json(users);
   } catch (err) {
     res.status(500).json({ message: 'Ошибка сервера', error: err.message });

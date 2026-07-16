@@ -81,3 +81,24 @@ router.post('/create-employee', authMiddleware, async (req, res) => {
 });
 
 module.exports = router;
+// Только админ может менять роль сотрудника
+router.patch('/users/:id/role', authMiddleware, async (req, res) => {
+  try {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Только администратор может менять роли' });
+    }
+    const { role } = req.body;
+    if (!['admin', 'employee'].includes(role)) {
+      return res.status(400).json({ message: 'Недопустимая роль' });
+    }
+    const user = await User.findByIdAndUpdate(req.params.id, { role }, { new: true });
+    if (!user) {
+      return res.status(404).json({ message: 'Пользователь не найден' });
+    }
+    res.json({ message: 'Роль обновлена', user });
+  } catch (err) {
+    res.status(500).json({ message: 'Ошибка сервера', error: err.message });
+  }
+});
+
+module.exports = router;
