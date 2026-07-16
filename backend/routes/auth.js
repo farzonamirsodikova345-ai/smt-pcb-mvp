@@ -7,6 +7,9 @@ const authMiddleware = require('../middleware/auth');
 
 // Обычная регистрация — всегда создаёт сотрудника
 router.post('/register', async (req, res) => {
+  return res.status(403).json({ message: 'Самостоятельная регистрация отключена. Обратитесь к администратору.' });
+});
+router.post('/register', async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
