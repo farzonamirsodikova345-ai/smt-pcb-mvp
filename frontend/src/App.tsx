@@ -1,7 +1,6 @@
 ﻿import { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Login from './Login';
-import Register from './Register';
 import Tasks from './Tasks';
 import CreateTask from './CreateTask';
 import Home from './Home';
@@ -42,26 +41,6 @@ function App() {
               <AuthBrand />
               <h1>SMT-PCB</h1>
               <Login onSuccess={() => { setIsLoggedIn(true); navigate('/'); }} />
-              <button onClick={() => navigate('/register')}>
-                Нет аккаунта? Зарегистрироваться
-              </button>
-            </div>
-          )
-        }
-      />
-      <Route
-        path="/register"
-        element={
-          isLoggedIn ? (
-            <Navigate to="/" />
-          ) : (
-            <div className="page-container">
-              <AuthBrand />
-              <h1>SMT-PCB</h1>
-              <Register />
-              <button onClick={() => navigate('/login')}>
-                Уже есть аккаунт? Войти
-              </button>
             </div>
           )
         }
