@@ -1,0 +1,147 @@
+﻿import { useState, useEffect } from 'react';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import Login from './Login';
+import Register from './Register';
+import Tasks from './Tasks';
+import CreateTask from './CreateTask';
+import Home from './Home';
+import Checklists from './CheckLists';
+import EmployeesList from './EmployeesList';
+import AddEmployeePage from './AddEmployeePage';
+import Layout from './Layout';
+import logo from './assets/images.png';
+import './App.css';
+
+function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) setIsLoggedIn(true);
+  }, []);
+
+  const role = localStorage.getItem('role');
+  const isAdmin = role === 'admin';
+
+  const AuthBrand = () => (
+    <div className="brand-block">
+      <img src={logo} alt="ARTEL" className="brand-logo" />
+      <span className="brand-text">ARTEL</span>
+    </div>
+  );
+
+  return (
+    <Routes>
+      <Route
+        path="/login"
+        element={
+          isLoggedIn ? (
+            <Navigate to="/" />
+          ) : (
+            <div className="page-container">
+              <AuthBrand />
+              <h1>SMT-PCB</h1>
+              <Login onSuccess={() => { setIsLoggedIn(true); navigate('/'); }} />
+              <button onClick={() => navigate('/register')}>
+                Нет аккаунта? Зарегистрироваться
+              </button>
+            </div>
+          )
+        }
+      />
+      <Route
+        path="/register"
+        element={
+          isLoggedIn ? (
+            <Navigate to="/" />
+          ) : (
+            <div className="page-container">
+              <AuthBrand />
+              <h1>SMT-PCB</h1>
+              <Register />
+              <button onClick={() => navigate('/login')}>
+                Уже есть аккаунт? Войти
+              </button>
+            </div>
+          )
+        }
+      />
+      <Route
+        path="/"
+        element={
+          isLoggedIn ? (
+            <Layout>
+              <Home />
+            </Layout>
+          ) : (
+            <Navigate to="/login" />
+          )
+        }
+      />
+      <Route
+        path="/tasks"
+        element={
+          isLoggedIn ? (
+            <Layout>
+              <Tasks />
+            </Layout>
+          ) : (
+            <Navigate to="/login" />
+          )
+        }
+      />
+      <Route
+        path="/create-task"
+        element={
+          isLoggedIn && isAdmin ? (
+            <Layout>
+              <CreateTask />
+            </Layout>
+          ) : (
+            <Navigate to="/tasks" />
+          )
+        }
+      />
+      <Route
+        path="/employees"
+        element={
+          isLoggedIn && isAdmin ? (
+            <Layout>
+              <EmployeesList />
+            </Layout>
+          ) : (
+            <Navigate to="/" />
+          )
+        }
+      />
+      <Route
+        path="/add-employee"
+        element={
+          isLoggedIn && isAdmin ? (
+            <Layout>
+              <AddEmployeePage />
+            </Layout>
+          ) : (
+            <Navigate to="/" />
+          )
+        }
+      />
+      <Route
+        path="/checklists"
+        element={
+          isLoggedIn ? (
+            <Layout>
+              <Checklists />
+            </Layout>
+          ) : (
+            <Navigate to="/login" />
+          )
+        }
+      />
+      <Route path="*" element={<Navigate to={isLoggedIn ? '/' : '/login'} />} />
+    </Routes>
+  );
+}
+
+export default App;
