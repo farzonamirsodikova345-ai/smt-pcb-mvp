@@ -6,7 +6,7 @@
 
 body {
   font-family: 'Inter', Arial, sans-serif;
-  background: #e8f5e9;
+  background: #ffffff;
   min-height: 100vh;
   display: flex;
   justify-content: center;
@@ -31,7 +31,7 @@ h2 {
 }
 
 div {
-  background: #f1f8f2;
+  background: #ffffff;
   border-radius: 12px;
   padding: 24px;
   box-shadow: 0 2px 8px rgba(46, 125, 50, 0.15);
@@ -644,8 +644,8 @@ p {
   box-shadow: none;
 }
 
-.dot-todo { background: #fb8c00 !important; }
-.dot-progress { background: #1e88e5 !important; }
+.dot-to do { background: #f23c3c !important; }
+.dot-progress { background: #4d6376e2 !important; }
 .dot-done { background: #43a047 !important; }
 
 .mini-list {
@@ -721,4 +721,27 @@ p {
     grid-template-columns: repeat(3, 1fr);
     gap: 12px;
   }
+}
+.add-employee-toggle {
+  display: block;
+  width: 100%;
+  background: #81c784;
+  color: white;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+}
+
+.add-employee-toggle:hover {
+  background: #66bb6a;
+}
+
+.add-employee-form-wrap {
+  background: transparent;
+  padding: 0;
+  box-shadow: none;
+  margin-bottom: 20px;
 }
