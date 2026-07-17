@@ -7,7 +7,7 @@ import Home from './Home';
 import Checklists from './CheckLists';
 import EmployeesList from './EmployeesList';
 import Layout from './Layout';
-import logo from './assets/images.png';
+import logo from './assets/images (1).png';
 import './App.css';
 
 function App() {

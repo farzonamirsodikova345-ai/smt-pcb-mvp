@@ -1,5 +1,5 @@
 ﻿import { useState, useEffect } from 'react';
-import { getTasks, updateTaskStatus, deleteTask } from './api';
+import { getTasks, createTask, updateTaskStatus, deleteTask } from './api';
 
 interface Task {
   _id: string;
@@ -14,7 +14,13 @@ interface Task {
 const STATUS_LABELS: Record<string, string> = {
   todo: 'К выполнению',
   in_progress: 'В процессе',
-  done: 'Готово'
+  done: 'Готово',
+};
+
+const STATUS_COLORS: Record<string, { bg: string; color: string }> = {
+  todo: { bg: '#fff3e0', color: '#fb8c00' },
+  in_progress: { bg: '#e3f2fd', color: '#1e88e5' },
+  done: { bg: '#e8f5e9', color: '#43a047' },
 };
 
 function StatusIcon({ status }: { status: string }) {
@@ -43,6 +49,13 @@ function StatusIcon({ status }: { status: string }) {
 
 function Tasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [showForm, setShowForm] = useState(false);
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [dueDate, setDueDate] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
   const token = localStorage.getItem('token') || '';
   const role = localStorage.getItem('role') || 'employee';
   const isAdmin = role === 'admin';
@@ -66,60 +79,194 @@ function Tasks() {
     loadTasks();
   };
 
+  const handleCreate = async () => {
+    if (!title.trim()) return;
+    setSaving(true);
+    setError('');
+    try {
+      await createTask(token, { title, description, dueDate });
+      setTitle('');
+      setDescription('');
+      setDueDate('');
+      setShowForm(false);
+      loadTasks();
+    } catch (err) {
+      console.error(err);
+      setError('Не удалось сохранить задачу');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <div>
-      <h2>Список задач</h2>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+        <h2 style={{ margin: 0 }}>Список задач</h2>
+        <button
+          onClick={() => setShowForm(!showForm)}
+          style={{
+            width: 36,
+            height: 36,
+            borderRadius: '50%',
+            border: 'none',
+            background: '#2e7d32',
+            color: '#fff',
+            fontSize: 20,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          +
+        </button>
+      </div>
 
-      <ul className="task-row-list">
-        {tasks.map((task) => (
-          <li key={task._id} className="task-row">
-            <span className="task-row-icon"><StatusIcon status={task.status} /></span>
+      {showForm && (
+        <div
+          style={{
+            background: '#fff',
+            border: '1px solid #e0e0e0',
+            borderRadius: 8,
+            padding: 16,
+            marginBottom: 16,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 10,
+          }}
+        >
+          <input
+            type="text"
+            placeholder="Название задачи"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            style={{ padding: '8px 10px', borderRadius: 6, border: '1px solid #ccc' }}
+          />
+          <textarea
+            placeholder="Описание"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={3}
+            style={{ padding: '8px 10px', borderRadius: 6, border: '1px solid #ccc', resize: 'vertical' }}
+          />
+          <input
+            type="date"
+            value={dueDate}
+            onChange={(e) => setDueDate(e.target.value)}
+            style={{ padding: '8px 10px', borderRadius: 6, border: '1px solid #ccc', width: 200 }}
+          />
+          {error && <div style={{ color: '#e53935', fontSize: 13 }}>{error}</div>}
+          <button
+            onClick={handleCreate}
+            disabled={saving}
+            style={{
+              padding: '8px 16px',
+              borderRadius: 6,
+              border: 'none',
+              background: '#2e7d32',
+              color: '#fff',
+              cursor: 'pointer',
+              alignSelf: 'flex-start',
+            }}
+          >
+            {saving ? 'Сохранение...' : 'Создать'}
+          </button>
+        </div>
+      )}
 
-            <div className="task-row-main">
-              <div className="task-row-title-line">
-                <span className="task-row-title">{task.title}</span>
-                {isAdmin && task.assignedTo && (
-                  <span className="task-row-assignee-inline">— {task.assignedTo.name}</span>
+      <ul className="task-row-list" style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+        {tasks.map((task) => {
+          const currentStatus = STATUS_COLORS[task.status] || STATUS_COLORS.todo;
+
+          return (
+            <li
+              key={task._id}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                background: '#fff',
+                border: '1px solid #eee',
+                borderRadius: 8,
+                padding: '12px 16px',
+                marginBottom: 8,
+                gap: 12,
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, flex: 1, minWidth: 220, background: 'transparent', padding: 0, boxShadow: 'none' }}>
+                <StatusIcon status={task.status} />
+                <div style={{ minWidth: 0, flex: 1, background: 'transparent', padding: 0, boxShadow: 'none' }}>
+                  <div style={{ background: 'transparent', padding: 0, boxShadow: 'none' }}>
+                    <span style={{ fontSize: 11, color: '#999', fontWeight: 600, textTransform: 'uppercase' }}>Название</span>
+                    <div style={{ fontWeight: 700, fontSize: 15, color: '#1b5e20', wordBreak: 'break-word' }}>
+                      {task.title}
+                    </div>
+                  </div>
+
+                  {task.description && (
+                    <div style={{ marginTop: 6, background: 'transparent', padding: 0, boxShadow: 'none' }}>
+                      <span style={{ fontSize: 11, color: '#999', fontWeight: 600, textTransform: 'uppercase' }}>Описание</span>
+                      <div style={{ color: '#555', fontSize: 13, wordBreak: 'break-word' }}>
+                        {task.description}
+                      </div>
+                    </div>
+                  )}
+
+                  {task.assignedTo && (
+                    <div style={{ marginTop: 6, background: 'transparent', padding: 0, boxShadow: 'none' }}>
+                      <span style={{ fontSize: 11, color: '#999', fontWeight: 600, textTransform: 'uppercase' }}>Исполнитель</span>
+                      <div style={{ color: '#388e3c', fontSize: 13, fontWeight: 600 }}>
+                        👤 {task.assignedTo.name}
+                        {task.assignedTo.position && (
+                          <span style={{ color: '#999', fontWeight: 400 }}> · {task.assignedTo.position}</span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0, background: 'transparent', padding: 0, boxShadow: 'none' }}>
+                <select
+                  value={task.status}
+                  onChange={(e) => handleStatusChange(task._id, e.target.value)}
+                  style={{
+                    padding: '8px 12px',
+                    borderRadius: 20,
+                    border: 'none',
+                    background: currentStatus.bg,
+                    color: currentStatus.color,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                  }}
+                >
+                  {Object.entries(STATUS_LABELS).map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+
+                {isAdmin && (
+                  <button
+                    onClick={() => handleDelete(task._id)}
+                    style={{
+                      padding: '8px 16px',
+                      borderRadius: 20,
+                      border: 'none',
+                      background: '#e53935',
+                      color: '#fff',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Удалить
+                  </button>
                 )}
               </div>
-              {task.description && <div className="task-row-desc">{task.description}</div>}
-              {isAdmin && task.assignedTo?.position && (
-                <div className="task-row-assignee-position">{task.assignedTo.position}</div>
-              )}
-            </div>
-
-            <div className="task-row-end">
-              <span className={`status-pill status-pill-${task.status}`}>{STATUS_LABELS[task.status]}</span>
-              {isAdmin ? (
-                <button className="task-delete-btn" onClick={() => handleDelete(task._id)}>Удалить</button>
-              ) : (
-                <select
-                  value={task.status}
-                  onChange={(e) => handleStatusChange(task._id, e.target.value)}
-                >
-                  <option value="todo">К выполнению</option>
-                  <option value="in_progress">В процессе</option>
-                  <option value="done">Готово</option>
-                </select>
-              )}
-            </div>
-
-            <div className="task-row-end">
-              {isAdmin ? (
-                <button className="task-delete-btn" onClick={() => handleDelete(task._id)}>Удалить</button>
-              ) : (
-                <select
-                  value={task.status}
-                  onChange={(e) => handleStatusChange(task._id, e.target.value)}
-                >
-                  <option value="todo">К выполнению</option>
-                  <option value="in_progress">В процессе</option>
-                  <option value="done">Готово</option>
-                </select>
-              )}
-            </div>
-          </li>
-        ))}
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

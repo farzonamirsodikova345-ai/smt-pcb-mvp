@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getTasks, getEmployees } from './api';
 
 interface Task {
@@ -20,6 +21,7 @@ interface Employee {
 function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
+  const navigate = useNavigate();
   const token = localStorage.getItem('token') || '';
   const name = localStorage.getItem('name') || '';
   const role = localStorage.getItem('role');
@@ -46,40 +48,50 @@ function Home() {
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .slice(0, 3);
 
-  const todayLabel = new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+  const now = new Date();
+  const todayLabel = now.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+  const timeLabel = now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
 
   const pct = (n: number) => total ? Math.round((n / total) * 100) : 0;
 
   const statusLabel: Record<string, string> = { todo: 'К выполнению', in_progress: 'В процессе', done: 'Готово' };
 
+  const featureCards = [
+  { icon: '📋', title: 'Производственные чек-листы', sub: 'Проверки и контроль', path: '/checklists' },
+  { icon: '📊', title: 'Отчёты', sub: `Выполнено ${done} из ${total}`, path: '/tasks' },
+  { icon: '⚙️', title: 'Оборудование', sub: 'Статус линий (SMT)', path: '/tasks' },
+  { icon: '📦', title: 'Материалы и компоненты', sub: 'Склад и поставки', path: '/tasks' },
+  ...(isAdmin
+    ? [{ icon: '👥', title: 'Пользователи', sub: 'Управление доступом', path: '/employees' }]
+    : []),
+];
+
   return (
     <div>
-      <div className="dashboard-greeting">
-        <h2 className="dashboard-hello">Добро пожаловать, {name} 👋</h2>
-        <div className="dashboard-date">{todayLabel}</div>
-      </div>
+      <section className="hero-section">
+        <div className="hero-tag">— Рады видеть вас снова!</div>
+        <h1 className="hero-title">
+  Добро пожаловать, <span className="hero-name">{name} 👋</span>
+</h1>
+        <p className="hero-subtitle">Система управления производством печатных плат (SMT-PCB)</p>
+        <div className="hero-meta">
+          <span className="hero-meta-item">📅 {todayLabel}</span>
+          <span className="hero-meta-item">🕒 {timeLabel}</span>
+          <span className="hero-meta-item hero-status">
+            <i className="status-dot" /> Система активна
+          </span>
+        </div>
+      </section>
 
-      <div className="stats-grid">
-        <div className="stat-card">
-          <div className="stat-icon">📌</div>
-          <div className="stat-value">{total}</div>
-          <div className="stat-label">Всего задач</div>
-        </div>
-        <div className="stat-card stat-progress">
-          <div className="stat-icon">⏳</div>
-          <div className="stat-value">{inProgress}</div>
-          <div className="stat-label">В работе</div>
-        </div>
-        <div className="stat-card stat-done">
-          <div className="stat-icon">✅</div>
-          <div className="stat-value">{done}</div>
-          <div className="stat-label">Выполнено</div>
-        </div>
-        <div className="stat-card stat-overdue">
-          <div className="stat-icon">❌</div>
-          <div className="stat-value">{overdue}</div>
-          <div className="stat-label">Просрочено</div>
-        </div>
+      <div className="feature-grid">
+        {featureCards.map((c) => (
+          <div key={c.title} className="feature-card" onClick={() => navigate(c.path)}>
+            <div className="feature-icon">{c.icon}</div>
+            <div className="feature-title">{c.title}</div>
+            <div className="feature-sub">{c.sub}</div>
+            <div className="feature-arrow">→</div>
+          </div>
+        ))}
       </div>
 
       <div className="dashboard-section">
@@ -133,6 +145,11 @@ function Home() {
         ) : (
           <p className="empty-hint">Новых уведомлений нет</p>
         )}
+      </div>
+
+      <div className="quote-strip">
+        <span className="quote-text">Качество — наша ответственность, эффективность — наш результат.</span>
+        <span className="quote-tags">PCB · SMT · Quality · Reliability</span>
       </div>
     </div>
   );
