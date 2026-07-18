@@ -42,13 +42,13 @@ function Reports() {
         Выполнено {done} из {total} ({pct}%)
       </p>
 
-      <table style={{ width: '100%', borderCollapse: 'collapse', background: '#fff' }}>
+      <table style={{ width: '100%', borderCollapse: 'collapse', background: '#fff', border: '1px solid #e0e0e0' }}>
         <thead>
-          <tr style={{ textAlign: 'left', borderBottom: '2px solid #eee' }}>
-            <th style={{ padding: '10px 12px' }}>Название</th>
-            <th style={{ padding: '10px 12px' }}>Описание</th>
-            <th style={{ padding: '10px 12px' }}>Сотрудник</th>
-            <th style={{ padding: '10px 12px' }}>Дедлайн</th>
+          <tr style={{ textAlign: 'left', borderBottom: '2px solid #e0e0e0' }}>
+            <th style={{ padding: '10px 12px', borderRight: '1px solid #e0e0e0' }}>Название</th>
+            <th style={{ padding: '10px 12px', borderRight: '1px solid #e0e0e0' }}>Описание</th>
+            <th style={{ padding: '10px 12px', borderRight: '1px solid #e0e0e0' }}>Сотрудник</th>
+            <th style={{ padding: '10px 12px', borderRight: '1px solid #e0e0e0' }}>Дедлайн</th>
             <th style={{ padding: '10px 12px' }}>Статус</th>
           </tr>
         </thead>
@@ -56,11 +56,11 @@ function Reports() {
           {tasks.map(task => {
             const color = STATUS_COLORS[task.status] || STATUS_COLORS.todo;
             return (
-              <tr key={task._id} style={{ borderBottom: '1px solid #f0f0f0' }}>
-                <td style={{ padding: '10px 12px', fontWeight: 600 }}>{task.title}</td>
-                <td style={{ padding: '10px 12px', color: '#555' }}>{task.description || '—'}</td>
-                <td style={{ padding: '10px 12px' }}>{task.assignedTo?.name || '—'}</td>
-                <td style={{ padding: '10px 12px' }}>
+              <tr key={task._id} style={{ borderBottom: '1px solid #e0e0e0' }}>
+                <td style={{ padding: '10px 12px', fontWeight: 600, borderRight: '1px solid #f0f0f0' }}>{task.title}</td>
+                <td style={{ padding: '10px 12px', color: '#555', borderRight: '1px solid #f0f0f0' }}>{task.description || '—'}</td>
+                <td style={{ padding: '10px 12px', borderRight: '1px solid #f0f0f0' }}>{task.assignedTo?.name || '—'}</td>
+                <td style={{ padding: '10px 12px', borderRight: '1px solid #f0f0f0' }}>
                   {task.dueDate ? new Date(task.dueDate).toLocaleDateString('ru-RU') : '—'}
                 </td>
                 <td style={{ padding: '10px 12px' }}>
