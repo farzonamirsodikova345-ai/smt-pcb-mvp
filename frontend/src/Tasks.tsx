@@ -1,6 +1,5 @@
 ﻿import { useState, useEffect } from 'react';
-import { getTasks, createTask, updateTaskStatus, deleteTask } from './api';
-
+import { getTasks, createTask, updateTaskStatus, deleteTask, getEmployees } from './api';
 interface Task {
   _id: string;
   title: string;
@@ -49,10 +48,12 @@ function StatusIcon({ status }: { status: string }) {
 
 function Tasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [employees, setEmployees] = useState<{ _id: string; name: string; position?: string }[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [dueDate, setDueDate] = useState('');
+  const [assignedTo, setAssignedTo] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
@@ -65,8 +66,9 @@ function Tasks() {
     setTasks(data);
   };
 
-  useEffect(() => {
+ useEffect(() => {
     loadTasks();
+    getEmployees(token).then(setEmployees).catch(() => {});
   }, []);
 
   const handleStatusChange = async (taskId: string, status: string) => {
@@ -83,11 +85,12 @@ function Tasks() {
     if (!title.trim()) return;
     setSaving(true);
     setError('');
-    try {
-      await createTask(token, title, description, '', dueDate);
+     try {
+      await createTask(token, title, description, assignedTo, dueDate);
       setTitle('');
       setDescription('');
       setDueDate('');
+      setAssignedTo('');
       setShowForm(false);
       loadTasks();
     } catch (err) {
@@ -155,6 +158,18 @@ function Tasks() {
             onChange={(e) => setDueDate(e.target.value)}
             style={{ padding: '8px 10px', borderRadius: 6, border: '1px solid #ccc', width: 200 }}
           />
+          <select
+            value={assignedTo}
+            onChange={(e) => setAssignedTo(e.target.value)}
+            style={{ padding: '8px 10px', borderRadius: 6, border: '1px solid #ccc' }}
+          >
+            <option value="">Без исполнителя</option>
+            {employees.map((emp) => (
+              <option key={emp._id} value={emp._id}>
+                {emp.name}{emp.position ? ` · ${emp.position}` : ''}
+              </option>
+            ))}
+          </select>
           {error && <div style={{ color: '#e53935', fontSize: 13 }}>{error}</div>}
           <button
             onClick={handleCreate}

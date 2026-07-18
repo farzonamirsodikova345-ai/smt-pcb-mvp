@@ -9,6 +9,7 @@ import EmployeesList from './EmployeesList';
 import Layout from './Layout';
 import logo from './assets/images (1).png';
 import './App.css';
+import Reports from './Reports';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -93,7 +94,18 @@ function App() {
           )
         }
       />
-      
+      <Route
+  path="/reports"
+  element={
+    isLoggedIn ? (
+      <Layout>
+        <Reports />
+      </Layout>
+    ) : (
+      <Navigate to="/login" />
+    )
+  }
+/>
       <Route
         path="/checklists"
         element={

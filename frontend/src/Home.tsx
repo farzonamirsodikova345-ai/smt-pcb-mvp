@@ -58,7 +58,7 @@ function Home() {
 
   const featureCards = [
   { icon: '📋', title: 'Производственные чек-листы', sub: 'Проверки и контроль', path: '/checklists' },
-  { icon: '📊', title: 'Отчёты', sub: `Выполнено ${done} из ${total}`, path: '/tasks' },
+  { icon: '📊', title: 'Отчёты', sub: `Выполнено ${done} из ${total}`, path: '/reports' },
   { icon: '⚙️', title: 'Оборудование', sub: 'Статус линий (SMT)', path: '/tasks' },
   { icon: '📦', title: 'Материалы и компоненты', sub: 'Склад и поставки', path: '/tasks' },
   ...(isAdmin
