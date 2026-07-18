@@ -12,7 +12,7 @@ const { taskOverdueEmail } = require('./utils/mailer');
 const app = express();
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 
 mongoose.connect(process.env.MONGO_URI, {
   serverSelectionTimeoutMS: 30000
