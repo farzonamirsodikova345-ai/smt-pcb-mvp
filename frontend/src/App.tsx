@@ -5,6 +5,7 @@ import Tasks from './Tasks';
 import CreateTask from './CreateTask';
 import Home from './Home';
 import Checklists from './CheckLists';
+import Equipment from './Equipment';
 import EmployeesList from './EmployeesList';
 import Layout from './Layout';
 import logo from './assets/images (1).png';
@@ -118,6 +119,18 @@ function App() {
           )
         }
       />
+      <Route
+  path="/equipment"
+  element={
+    isLoggedIn ? (
+      <Layout>
+        <Equipment />
+      </Layout>
+    ) : (
+      <Navigate to="/login" />
+    )
+  }
+/>
       <Route path="*" element={<Navigate to={isLoggedIn ? '/' : '/login'} />} />
     </Routes>
   );

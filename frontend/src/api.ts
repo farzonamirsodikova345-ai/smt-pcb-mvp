@@ -68,3 +68,25 @@ export const updateUserRole = async (token: string, userId: string, role: string
   );
   return response.data;
 };
+export const getEquipment = async (token: string) => {
+  const response = await axios.get(`${API_URL}/equipment`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+};
+
+export const createEquipment = async (token: string, name: string, description: string, photoUrl: string) => {
+  const response = await axios.post(
+    `${API_URL}/equipment`,
+    { name, description, photoUrl },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+};
+
+export const deleteEquipment = async (token: string, id: string) => {
+  const response = await axios.delete(`${API_URL}/equipment/${id}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+};
