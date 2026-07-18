@@ -4,7 +4,7 @@ const criterionSchema = new mongoose.Schema({
   title: { type: String, default: '' },
   type: {
     type: String,
-    enum: ['yesNoNA', 'scale', 'list', 'multiselect', 'number', 'checkbox', 'datetime', 'photo', 'text', 'info', 'signature'],
+    enum: ['yesNo', 'photo', 'text', 'info'],
     default: 'text',
   },
   weight: { type: Number, default: 1 },
@@ -25,9 +25,6 @@ const checkListTemplateSchema = new mongoose.Schema({
   name: { type: String, required: true },
   instruction: { type: String, default: '' },
   color: { type: String, default: '#2e7d32' },
-  linearFlow: { type: Boolean, default: false },
-  allowGalleryUpload: { type: Boolean, default: false },
-  requireGeolocation: { type: Boolean, default: false },
   sections: [sectionSchema],
 }, { timestamps: true });
 
