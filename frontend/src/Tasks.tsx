@@ -84,7 +84,7 @@ function Tasks() {
     setSaving(true);
     setError('');
     try {
-      await createTask(token, { title, description, dueDate });
+      await createTask(token, title, description, '', dueDate);
       setTitle('');
       setDescription('');
       setDueDate('');
