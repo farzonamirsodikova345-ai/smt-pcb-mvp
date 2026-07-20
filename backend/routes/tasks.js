@@ -7,7 +7,9 @@ const { taskCreatedEmail, taskStatusChangedEmail } = require('../utils/mailer');
 router.get('/', authMiddleware, async (req, res) => {
   try {
     const filter = req.user.role === 'admin' ? {} : { assignedTo: req.user.id };
-    const tasks = await Task.find(filter).populate('assignedTo', 'name email position');
+    const tasks = await Task.find(filter)
+      .populate('assignedTo', 'name email position')
+      .populate('createdBy', 'name email position');
     res.json(tasks);
   } catch (err) {
     res.status(500).json({ message: 'Ошибка сервера', error: err.message });
@@ -29,12 +31,15 @@ router.post('/', authMiddleware, async (req, res) => {
     });
 
     // Отправка email-уведомления назначенному сотруднику
-    const populatedTask = await task.populate('assignedTo', 'name email position');
+    const populatedTask = await task.populate([
+      { path: 'assignedTo', select: 'name email position' },
+      { path: 'createdBy', select: 'name email position' },
+    ]);
     if (populatedTask.assignedTo) {
       taskCreatedEmail(populatedTask, populatedTask.assignedTo);
     }
 
-    res.status(201).json(task);
+    res.status(201).json(populatedTask);
   } catch (err) {
     res.status(500).json({ message: 'Ошибка сервера', error: err.message });
   }
@@ -44,7 +49,8 @@ router.patch('/:id', authMiddleware, async (req, res) => {
   try {
     const { status } = req.body;
     const task = await Task.findByIdAndUpdate(req.params.id, { status }, { new: true })
-      .populate('assignedTo', 'name email position');
+      .populate('assignedTo', 'name email position')
+      .populate('createdBy', 'name email position');
 
     // Отправка email-уведомления о смене статуса
     if (task.assignedTo) {

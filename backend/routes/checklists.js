@@ -51,7 +51,11 @@ router.post('/', auth, adminOnly, async (req, res) => {
 
 router.patch('/:id', auth, adminOnly, async (req, res) => {
   try {
-    const updated = await CheckListTemplate.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const dataToUpdate = {
+      ...req.body,
+      updatedBy: req.user.name || req.user.email || req.user.id,
+    };
+    const updated = await CheckListTemplate.findByIdAndUpdate(req.params.id, dataToUpdate, { new: true });
     res.json(updated);
   } catch (err) {
     res.status(500).json({ message: 'Ошибка сервера', error: err.message });

@@ -29,6 +29,7 @@ app.get('/', (req, res) => {
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/equipment', require('./routes/equipment'));
 app.use('/api/checklists', require('./routes/checklists'));
+app.use('/api/inspections', require('./routes/inspections'));
 app.use('/api/tasks', require('./routes/tasks'));
 
 // Ежедневная проверка просроченных задач — каждый день в 9:00 утра

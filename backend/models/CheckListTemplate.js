@@ -26,6 +26,9 @@ const checkListTemplateSchema = new mongoose.Schema({
   instruction: { type: String, default: '' },
   color: { type: String, default: '#2e7d32' },
   sections: [sectionSchema],
+  updatedBy: { type: String, default: '' },
+  usageCount: { type: Number, default: 0 },
+  lastUsedAt: { type: Date, default: null },
 }, { timestamps: true });
 
 module.exports = mongoose.model('CheckListTemplate', checkListTemplateSchema);

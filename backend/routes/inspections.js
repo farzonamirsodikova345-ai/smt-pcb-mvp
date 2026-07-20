@@ -49,6 +49,12 @@ router.post('/', auth, async (req, res) => {
       answers: [],
     });
     await inspection.save();
+
+    await CheckListTemplate.findByIdAndUpdate(templateId, {
+      $inc: { usageCount: 1 },
+      lastUsedAt: new Date(),
+    });
+
     res.status(201).json(inspection);
   } catch (err) {
     res.status(500).json({ message: 'Ошибка сервера', error: err.message });
