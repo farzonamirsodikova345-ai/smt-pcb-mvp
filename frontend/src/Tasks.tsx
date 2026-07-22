@@ -6,6 +6,7 @@ interface Task {
   description: string;
   status: string;
   assignedTo?: { name: string; email: string; position?: string };
+  createdBy?: { name: string; email: string; position?: string };
   dueDate?: string;
   createdAt: string;
 }
@@ -21,30 +22,6 @@ const STATUS_COLORS: Record<string, { bg: string; color: string }> = {
   in_progress: { bg: '#e3f2fd', color: '#1e88e5' },
   done: { bg: '#e8f5e9', color: '#43a047' },
 };
-
-function StatusIcon({ status }: { status: string }) {
-  if (status === 'done') {
-    return (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-        <circle cx="12" cy="12" r="10" fill="#43a047" />
-        <path d="M7 12.5l3 3 7-7" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    );
-  }
-  if (status === 'in_progress') {
-    return (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-        <circle cx="12" cy="12" r="10" fill="#1e88e5" />
-        <path d="M12 7v5l3.5 2" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    );
-  }
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-      <circle cx="12" cy="12" r="9" stroke="#fb8c00" strokeWidth="2.5" strokeDasharray="4 3" />
-    </svg>
-  );
-}
 
 function Tasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -66,7 +43,7 @@ function Tasks() {
     setTasks(data);
   };
 
- useEffect(() => {
+  useEffect(() => {
     loadTasks();
     getEmployees(token).then(setEmployees).catch(() => {});
   }, []);
@@ -85,7 +62,7 @@ function Tasks() {
     if (!title.trim()) return;
     setSaving(true);
     setError('');
-     try {
+    try {
       await createTask(token, title, description, assignedTo, dueDate);
       setTitle('');
       setDescription('');
@@ -189,100 +166,98 @@ function Tasks() {
         </div>
       )}
 
-      <ul className="task-row-list" style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-        {tasks.map((task) => {
-          const currentStatus = STATUS_COLORS[task.status] || STATUS_COLORS.todo;
-
-          return (
-            <li
-              key={task._id}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                flexWrap: 'wrap',
-                background: '#fff',
-                border: '1px solid #eee',
-                borderRadius: 8,
-                padding: '12px 16px',
-                marginBottom: 8,
-                gap: 12,
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, flex: 1, minWidth: 220, background: 'transparent', padding: 0, boxShadow: 'none' }}>
-                <StatusIcon status={task.status} />
-                <div style={{ minWidth: 0, flex: 1, background: 'transparent', padding: 0, boxShadow: 'none' }}>
-                  <div style={{ background: 'transparent', padding: 0, boxShadow: 'none' }}>
-                    <span style={{ fontSize: 11, color: '#999', fontWeight: 600, textTransform: 'uppercase' }}>Название</span>
-                    <div style={{ fontWeight: 700, fontSize: 15, color: '#1b5e20', wordBreak: 'break-word' }}>
-                      {task.title}
-                    </div>
-                  </div>
-
-                  {task.description && (
-                    <div style={{ marginTop: 6, background: 'transparent', padding: 0, boxShadow: 'none' }}>
-                      <span style={{ fontSize: 11, color: '#999', fontWeight: 600, textTransform: 'uppercase' }}>Описание</span>
-                      <div style={{ color: '#555', fontSize: 13, wordBreak: 'break-word' }}>
-                        {task.description}
-                      </div>
-                    </div>
-                  )}
-
-                  {task.assignedTo && (
-                    <div style={{ marginTop: 6, background: 'transparent', padding: 0, boxShadow: 'none' }}>
-                      <span style={{ fontSize: 11, color: '#999', fontWeight: 600, textTransform: 'uppercase' }}>Исполнитель</span>
-                      <div style={{ color: '#388e3c', fontSize: 13, fontWeight: 600 }}>
+      <div style={{ background: '#fff', border: '1px solid #eee', borderRadius: 8, overflow: 'hidden' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <thead>
+            <tr style={{ background: '#f7faf7', textAlign: 'left' }}>
+              <th style={{ padding: '10px 14px', fontSize: 12, color: '#1b5e20', textTransform: 'uppercase' }}>Название</th>
+              <th style={{ padding: '10px 14px', fontSize: 12, color: '#1b5e20', textTransform: 'uppercase' }}>Описание</th>
+              <th style={{ padding: '10px 14px', fontSize: 12, color: '#1b5e20', textTransform: 'uppercase' }}>Исполнитель</th>
+              <th style={{ padding: '10px 14px', fontSize: 12, color: '#1b5e20', textTransform: 'uppercase' }}>Кем поручено</th>
+              <th style={{ padding: '10px 14px', fontSize: 12, color: '#1b5e20', textTransform: 'uppercase' }}>Статус</th>
+              {isAdmin && <th style={{ padding: '10px 14px' }} />}
+            </tr>
+          </thead>
+          <tbody>
+            {tasks.map((task) => {
+              const currentStatus = STATUS_COLORS[task.status] || STATUS_COLORS.todo;
+              return (
+                <tr key={task._id} style={{ borderTop: '1px solid #f0f0f0' }}>
+                  <td style={{ padding: '10px 14px', fontWeight: 700, color: '#1b5e20', fontSize: 14 }}>
+                    {task.title}
+                  </td>
+                  <td style={{ padding: '10px 14px', color: '#555', fontSize: 13, maxWidth: 260 }}>
+                    {task.description || '—'}
+                  </td>
+                  <td style={{ padding: '10px 14px', color: '#388e3c', fontSize: 13, fontWeight: 600 }}>
+                    {task.assignedTo ? (
+                      <>
                         👤 {task.assignedTo.name}
                         {task.assignedTo.position && (
                           <span style={{ color: '#999', fontWeight: 400 }}> · {task.assignedTo.position}</span>
                         )}
-                      </div>
-                    </div>
+                      </>
+                    ) : '—'}
+                  </td>
+                  <td style={{ padding: '10px 14px', color: '#555', fontSize: 13 }}>
+                    {task.createdBy ? (
+                      <>
+                        {task.createdBy.name}
+                        {task.createdBy.position && (
+                          <span style={{ color: '#999' }}> · {task.createdBy.position}</span>
+                        )}
+                      </>
+                    ) : '—'}
+                  </td>
+                  <td style={{ padding: '10px 14px' }}>
+                    <select
+                      value={task.status}
+                      onChange={(e) => handleStatusChange(task._id, e.target.value)}
+                      style={{
+                        padding: '6px 10px',
+                        borderRadius: 20,
+                        border: 'none',
+                        background: currentStatus.bg,
+                        color: currentStatus.color,
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        fontSize: 13,
+                      }}
+                    >
+                      {Object.entries(STATUS_LABELS).map(([value, label]) => (
+                        <option key={value} value={value}>
+                          {label}
+                        </option>
+                      ))}
+                    </select>
+                  </td>
+                  {isAdmin && (
+                    <td style={{ padding: '10px 14px' }}>
+                      <button
+                        onClick={() => handleDelete(task._id)}
+                        style={{
+                          padding: '6px 12px',
+                          borderRadius: 20,
+                          border: 'none',
+                          background: '#e53935',
+                          color: '#fff',
+                          cursor: 'pointer',
+                          fontSize: 12,
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        Удалить
+                      </button>
+                    </td>
                   )}
-                </div>
-              </div>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0, background: 'transparent', padding: 0, boxShadow: 'none' }}>
-                <select
-                  value={task.status}
-                  onChange={(e) => handleStatusChange(task._id, e.target.value)}
-                  style={{
-                    padding: '8px 12px',
-                    borderRadius: 20,
-                    border: 'none',
-                    background: currentStatus.bg,
-                    color: currentStatus.color,
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                  }}
-                >
-                  {Object.entries(STATUS_LABELS).map(([value, label]) => (
-                    <option key={value} value={value}>
-                      {label}
-                    </option>
-                  ))}
-                </select>
-
-                {isAdmin && (
-                  <button
-                    onClick={() => handleDelete(task._id)}
-                    style={{
-                      padding: '8px 16px',
-                      borderRadius: 20,
-                      border: 'none',
-                      background: '#e53935',
-                      color: '#fff',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    Удалить
-                  </button>
-                )}
-              </div>
-            </li>
-          );
-        })}
-      </ul>
+      {tasks.length === 0 && <p style={{ color: '#999', marginTop: 12 }}>Задач пока нет</p>}
     </div>
   );
 }

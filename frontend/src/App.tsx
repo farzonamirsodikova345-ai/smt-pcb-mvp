@@ -5,31 +5,50 @@ import Tasks from './Tasks';
 import CreateTask from './CreateTask';
 import Home from './Home';
 import Checklists from './CheckLists';
+import CheckListEditor from './CheckListEditor';
+import Inspection from './Inspection';
+import InspectionHistory from './InspectionHistory';
 import Equipment from './Equipment';
 import EmployeesList from './EmployeesList';
+import CreateEmployee from './CreateEmployee';
 import Layout from './Layout';
-import logo from './assets/images (1).png';
 import './App.css';
 import Reports from './Reports';
+import EquipmentDetail from './EquipmentDetail';
+import Materials from './Materials';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) setIsLoggedIn(true);
+    checkAuth();
   }, []);
+
+  const checkAuth = () => {
+    const token = localStorage.getItem('token');
+    setIsLoggedIn(!!token);
+    setIsLoading(false);
+  };
+
+  const handleLoginSuccess = () => {
+    checkAuth();
+    navigate('/');
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('role');
+    setIsLoggedIn(false);
+    navigate('/login');
+  };
 
   const role = localStorage.getItem('role');
   const isAdmin = role === 'admin';
 
-  const AuthBrand = () => (
-    <div className="brand-block">
-      <img src={logo} alt="ARTEL" className="brand-logo" />
-      <span className="brand-text">ARTEL</span>
-    </div>
-  );
+  if (isLoading) return <div>Loading...</div>;
 
   return (
     <Routes>
@@ -39,11 +58,7 @@ function App() {
           isLoggedIn ? (
             <Navigate to="/" />
           ) : (
-            <div className="page-container">
-              <AuthBrand />
-              <h1>SMT-PCB</h1>
-              <Login onSuccess={() => { setIsLoggedIn(true); navigate('/'); }} />
-            </div>
+            <Login onSuccess={handleLoginSuccess} />
           )
         }
       />
@@ -51,7 +66,7 @@ function App() {
         path="/"
         element={
           isLoggedIn ? (
-            <Layout>
+            <Layout onLogout={handleLogout}>
               <Home />
             </Layout>
           ) : (
@@ -63,7 +78,7 @@ function App() {
         path="/tasks"
         element={
           isLoggedIn ? (
-            <Layout>
+            <Layout onLogout={handleLogout}>
               <Tasks />
             </Layout>
           ) : (
@@ -75,7 +90,7 @@ function App() {
         path="/create-task"
         element={
           isLoggedIn && isAdmin ? (
-            <Layout>
+            <Layout onLogout={handleLogout}>
               <CreateTask />
             </Layout>
           ) : (
@@ -87,7 +102,7 @@ function App() {
         path="/employees"
         element={
           isLoggedIn && isAdmin ? (
-            <Layout>
+            <Layout onLogout={handleLogout}>
               <EmployeesList />
             </Layout>
           ) : (
@@ -96,22 +111,34 @@ function App() {
         }
       />
       <Route
-  path="/reports"
-  element={
-    isLoggedIn ? (
-      <Layout>
-        <Reports />
-      </Layout>
-    ) : (
-      <Navigate to="/login" />
-    )
-  }
-/>
+        path="/create-employee"
+        element={
+          isLoggedIn && isAdmin ? (
+            <Layout onLogout={handleLogout}>
+              <CreateEmployee />
+            </Layout>
+          ) : (
+            <Navigate to="/employees" />
+          )
+        }
+      />
+      <Route
+        path="/reports"
+        element={
+          isLoggedIn ? (
+            <Layout onLogout={handleLogout}>
+              <Reports />
+            </Layout>
+          ) : (
+            <Navigate to="/login" />
+          )
+        }
+      />
       <Route
         path="/checklists"
         element={
           isLoggedIn ? (
-            <Layout>
+            <Layout onLogout={handleLogout}>
               <Checklists />
             </Layout>
           ) : (
@@ -120,17 +147,77 @@ function App() {
         }
       />
       <Route
-  path="/equipment"
-  element={
-    isLoggedIn ? (
-      <Layout>
-        <Equipment />
-      </Layout>
-    ) : (
-      <Navigate to="/login" />
-    )
-  }
-/>
+        path="/checklists/:id"
+        element={
+          isLoggedIn && isAdmin ? (
+            <Layout onLogout={handleLogout}>
+              <CheckListEditor />
+            </Layout>
+          ) : (
+            <Navigate to="/checklists" />
+          )
+        }
+      />
+      <Route
+        path="/checklists/:id/history"
+        element={
+          isLoggedIn ? (
+            <Layout onLogout={handleLogout}>
+              <InspectionHistory />
+            </Layout>
+          ) : (
+            <Navigate to="/login" />
+          )
+        }
+      />
+      <Route
+        path="/inspections/:id"
+        element={
+          isLoggedIn ? (
+            <Layout onLogout={handleLogout}>
+              <Inspection />
+            </Layout>
+          ) : (
+            <Navigate to="/login" />
+          )
+        }
+      />
+      <Route
+        path="/equipment"
+        element={
+          isLoggedIn ? (
+            <Layout onLogout={handleLogout}>
+              <Equipment />
+            </Layout>
+          ) : (
+            <Navigate to="/login" />
+          )
+        }
+      />
+      <Route
+        path="/materials"
+        element={
+          isLoggedIn ? (
+            <Layout onLogout={handleLogout}>
+              <Materials />
+            </Layout>
+          ) : (
+            <Navigate to="/login" />
+          )
+        }
+      />
+      <Route
+        path="/equipment/:id"
+        element={
+          isLoggedIn ? (
+            <Layout onLogout={handleLogout}>
+              <EquipmentDetail />
+            </Layout>
+          ) : (
+            <Navigate to="/login" />
+          )
+        }
+      />
       <Route path="*" element={<Navigate to={isLoggedIn ? '/' : '/login'} />} />
     </Routes>
   );

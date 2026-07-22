@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-import { getEmployees, createEmployee, updateUserRole } from './api';
+import { useNavigate } from 'react-router-dom';
+import { getEmployees, deleteUser } from './api';
+import './EmployeesList.css';
 
 interface Employee {
   _id: string;
@@ -9,108 +11,106 @@ interface Employee {
   role: string;
 }
 
-function EmployeesList() {
-  const [employees, setEmployees] = useState<Employee[]>([]);
-  const [showForm, setShowForm] = useState(false);
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [position, setPosition] = useState('');
-  const [message, setMessage] = useState('');
-  const token = localStorage.getItem('token') || '';
-  const myId = JSON.parse(atob(token.split('.')[1] || 'e30=')).id;
+const roleLabels: Record<string, string> = {
+  admin: 'Админ',
+  technologist: 'Технолог',
+  engineer: 'Инженер',
+  operator: 'Оператор',
+};
 
-  const load = () => {
-    getEmployees(token).then(setEmployees);
-  };
+export default function EmployeesList() {
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    load();
+    loadEmployees();
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setMessage('');
+  const loadEmployees = async () => {
+    setLoading(true);
+    setError('');
     try {
-      await createEmployee(token, name, email, password, position);
-      setMessage('Сотрудник успешно добавлен');
-      setName('');
-      setEmail('');
-      setPassword('');
-      setPosition('');
-      load();
-      setTimeout(() => setShowForm(false), 800);
+      const token = localStorage.getItem('token') || '';
+      const data = await getEmployees(token);
+      setEmployees(data);
     } catch (err: any) {
-      setMessage(err.response?.data?.message || 'Ошибка добавления сотрудника');
+      setError(err?.response?.data?.message || 'Не удалось загрузить сотрудников');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleRoleChange = async (id: string, newRole: string) => {
-    await updateUserRole(token, id, newRole);
-    load();
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('Удалить сотрудника?')) return;
+    setDeletingId(id);
+    try {
+      const token = localStorage.getItem('token') || '';
+      await deleteUser(token, id);
+      setEmployees((prev) => prev.filter((emp) => emp._id !== id));
+    } catch (err: any) {
+      setError(err?.response?.data?.message || 'Не удалось удалить сотрудника');
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   return (
-    <div>
-      <h2>Сотрудники</h2>
+    <div className="employees-list-page">
+      <div className="employees-list-header">
+        <button
+          className="btn-add-employee-link"
+          onClick={() => navigate('/create-employee')}
+        >
+          + Добавить сотрудника
+        </button>
+      </div>
 
-      <button className="add-employee-toggle" onClick={() => setShowForm(!showForm)}>
-        {showForm ? '− Скрыть форму' : '+ Добавить сотрудника'}
-      </button>
+      {error && <div className="employees-list-error">{error}</div>}
 
-      {showForm && (
-        <div className="add-employee-form-wrap">
-          {message && <p>{message}</p>}
-          <form onSubmit={handleSubmit}>
-            <input type="text" placeholder="Имя сотрудника" value={name} onChange={(e) => setName(e.target.value)} required />
-            <input type="email" placeholder="Email сотрудника" value={email} onChange={(e) => setEmail(e.target.value)} required />
-            <input type="text" placeholder="Должность" value={position} onChange={(e) => setPosition(e.target.value)} />
-            <input type="password" placeholder="Временный пароль" value={password} onChange={(e) => setPassword(e.target.value)} required />
-            <button type="submit">Сохранить сотрудника</button>
-          </form>
-        </div>
-      )}
-
-      <h2 style={{ marginTop: '24px' }}>Список сотрудников</h2>
-      <div className="employee-table-wrap">
-        <table className="employee-table">
-          <thead>
-            <tr>
-              <th>Имя</th>
-              <th>Email</th>
-              <th>Должность</th>
-              <th>Роль</th>
-              <th>Действие</th>
-            </tr>
-          </thead>
-          <tbody>
-            {employees.map((emp) => (
-              <tr key={emp._id}>
-                <td>{emp.name}</td>
-                <td>{emp.email}</td>
-                <td>{emp.position || '—'}</td>
-                <td>
-                  <span className={`role-pill role-${emp.role}`}>
-                    {emp.role === 'admin' ? 'Администратор' : 'Сотрудник'}
-                  </span>
-                </td>
-                <td>
-                  {emp._id !== myId && (
-                    <button
-                      className="role-switch-btn"
-                      onClick={() => handleRoleChange(emp._id, emp.role === 'admin' ? 'employee' : 'admin')}
-                    >
-                      {emp.role === 'admin' ? 'Сделать сотрудником' : 'Сделать админом'}
-                    </button>
-                  )}
-                </td>
+      <div className="employees-list-card">
+        <h2 className="employees-list-title">Список сотрудников</h2>
+        {loading ? (
+          <div className="employees-list-empty">Загрузка...</div>
+        ) : employees.length === 0 ? (
+          <div className="employees-list-empty">Сотрудников пока нет</div>
+        ) : (
+          <table className="employees-table">
+            <thead>
+              <tr>
+                <th>Имя</th>
+                <th>Email</th>
+                <th>Должность</th>
+                <th>Статус</th>
+                <th></th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {employees.map((emp) => (
+                <tr key={emp._id}>
+                  <td>{emp.name}</td>
+                  <td>{emp.email}</td>
+                  <td>{emp.position || '—'}</td>
+                  <td>{roleLabels[emp.role] || emp.role}</td>
+                  <td className="employees-table-actions">
+                    {emp.role !== 'admin' && (
+                      <button
+                        className="btn-delete-employee"
+                        onClick={() => handleDelete(emp._id)}
+                        disabled={deletingId === emp._id}
+                      >
+                        {deletingId === emp._id ? '...' : 'Удалить'}
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );
 }
-
-export default EmployeesList;

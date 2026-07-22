@@ -1,0 +1,111 @@
+.employees-list-page {
+  max-width: 100%;
+}
+
+.employees-list-header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.btn-add-employee-link {
+  background: #66bb6a;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.1rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.btn-add-employee-link:hover {
+  background: #57a05b;
+}
+
+.employees-list-error {
+  color: #e53935;
+  font-size: 0.85rem;
+  background: #fdecea;
+  padding: 0.6rem 0.9rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.employees-list-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.employees-list-title {
+  color: #2e7d32;
+  font-size: 1.2rem;
+  margin: 0 0 1rem 0;
+}
+
+.employees-list-empty {
+  text-align: center;
+  color: #999;
+  padding: 2rem 0;
+}
+
+.employees-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.employees-table th {
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #777;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.6rem 0.5rem;
+  border-bottom: 2px solid #ddd;
+}
+
+.employees-table td {
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid #ddd;
+  border-right: 1px solid #eee;
+  font-size: 0.95rem;
+}
+
+.employees-table td:last-child {
+  border-right: none;
+}
+
+.employees-table tr:last-child td {
+  border-bottom: none;
+}
+
+.employees-table tbody tr:hover {
+  background: #f9fbf9;
+}
+
+.employees-table-actions {
+  text-align: right;
+}
+
+.btn-delete-employee {
+  background: none;
+  border: 1px solid #e57373;
+  color: #e53935;
+  border-radius: 6px;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.btn-delete-employee:hover {
+  background: #fdecea;
+}
+
+.btn-delete-employee:disabled {
+  opacity: 0.6;
+  cursor: default;
+}

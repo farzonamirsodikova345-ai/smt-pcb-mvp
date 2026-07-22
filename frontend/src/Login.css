@@ -1,0 +1,378 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden; /* страница никогда не скроллится и не двигается */
+}
+
+.login-page {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh; /* учитывает адресную строку в мобильных браузерах */
+  background: #0a0f0d;
+  overflow: hidden;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+/* ===== ПАНЕЛЬ: PCB ===== */
+.pcb-panel {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: #0a0f0d;
+  min-width: 0;
+  min-height: 0;
+}
+
+.pcb-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: left center;
+}
+
+.pcb-glow {
+  animation: pcb-breathe 4s ease-in-out infinite;
+}
+
+@keyframes pcb-breathe {
+  0%, 100% { filter: drop-shadow(0 0 20px rgba(63,189,127,0.15)); }
+  50% { filter: drop-shadow(0 0 35px rgba(63,189,127,0.3)); }
+}
+
+.trace-flow {
+  stroke-dasharray: 8 12;
+  animation: trace-move 3s linear infinite;
+}
+
+@keyframes trace-move {
+  to { stroke-dashoffset: -40; }
+}
+
+.signal-pulse {
+  animation: signal-blink 2s ease-in-out infinite;
+}
+
+@keyframes signal-blink {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.component-place {
+  animation: place-pop 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+@keyframes place-pop {
+  0% { opacity: 0; transform: scale(0.3); }
+  70% { opacity: 0.9; transform: scale(1.05); }
+  100% { opacity: 0.85; transform: scale(1); }
+}
+
+.reflow-bar {
+  animation: reflow-slide 6s linear infinite;
+}
+
+@keyframes reflow-slide {
+  0% { transform: translateX(-60px); }
+  100% { transform: translateX(440px); }
+}
+
+.scan-line {
+  animation: scan-sweep 4s ease-in-out infinite;
+}
+
+@keyframes scan-sweep {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(360px); }
+}
+
+/* Робот реально опускается на плату и поднимается — как будто ставит/паяет деталь */
+.robot-descend {
+  animation: descend 3s ease-in-out infinite;
+  transform-origin: top center;
+}
+.robot-1 { animation-delay: 0s; }
+.robot-2 { animation-delay: 1.5s; } /* второй робот работает со сдвигом по времени */
+
+@keyframes descend {
+  0%   { transform: translateY(0); }
+  35%  { transform: translateY(0); }
+  50%  { transform: translateY(38px); } /* касание платы */
+  62%  { transform: translateY(38px); }
+  85%  { transform: translateY(0); }
+  100% { transform: translateY(0); }
+}
+
+/* Вспышка пайки в момент касания — синхронизирована с descend */
+.solder-spark {
+  opacity: 0;
+  animation: spark 3s ease-in-out infinite;
+}
+.spark-1 { animation-delay: 0s; }
+.spark-2 { animation-delay: 1.5s; }
+
+@keyframes spark {
+  0%, 42% { opacity: 0; transform: scale(0.3); }
+  50%     { opacity: 1; transform: scale(1.3); }
+  58%     { opacity: 0.7; transform: scale(1); }
+  65%, 100% { opacity: 0; transform: scale(0.3); }
+}
+
+/* ===== ПАНЕЛЬ: ФОРМА ===== */
+.form-panel {
+  width: 380px;
+  min-width: 380px;
+  max-width: 380px;
+  height: 100%;
+  background: #0d1410;
+  border-left: 1px solid #1a3d2a;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 24px 32px;
+  position: relative;
+  z-index: 10;
+  overflow-y: auto; /* если контент не влезает по высоте — скроллится только сама форма, а не вся страница */
+}
+
+.form-inner {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s ease;
+  margin: auto 0;
+}
+
+.form-inner.fade-up {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.logo-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.logo-text {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+  color: #e8f5e9;
+}
+
+.logo-accent {
+  color: #52e39a;
+}
+
+.logo-sub {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #8fa89a;
+  margin-top: 2px;
+}
+
+.tagline {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid #1a3d2a;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #8fa89a;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.tagline::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: #3fbd7f;
+  border-radius: 10px 0 0 10px;
+  opacity: 0.6;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.error-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,107,53,0.08);
+  border: 1px solid rgba(255,107,53,0.2);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #ff6b35;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #8fa89a;
+  font-weight: 500;
+}
+
+.input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid #1a3d2a;
+  border-radius: 10px;
+  padding: 0 14px;
+  height: 42px;
+  transition: all 0.2s ease;
+}
+
+.input-wrap.focused {
+  border-color: #52e39a;
+  box-shadow: 0 0 0 3px rgba(82,227,154,0.1);
+  background: rgba(255,255,255,0.06);
+}
+
+.input-icon {
+  width: 18px;
+  height: 18px;
+  color: #8fa89a;
+  flex-shrink: 0;
+  margin-right: 12px;
+}
+
+.input-wrap input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #1a1a1a;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.input-wrap input::placeholder {
+  color: #888;
+  opacity: 0.7;
+}
+
+.eye-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #8fa89a;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.eye-btn:hover {
+  color: #52e39a;
+}
+
+.submit-btn {
+  height: 42px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #3fbd7f, #52e39a);
+  color: #06140d;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 4px;
+  transition: all 0.2s ease;
+}
+
+.submit-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(63,189,127,0.3);
+}
+
+.submit-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ===== АДАПТИВ: планшет / маленький ноутбук ===== */
+@media (max-width: 1100px) {
+  .form-panel {
+    width: 340px;
+    min-width: 340px;
+    max-width: 340px;
+    padding: 20px 26px;
+  }
+}
+
+/* ===== АДАПТИВ: телефон ===== */
+@media (max-width: 720px) {
+  .login-page {
+    flex-direction: column;
+  }
+  .pcb-panel {
+    flex: 0 0 38%; /* плата сверху, занимает верхнюю часть экрана */
+    min-height: 0;
+  }
+  .form-panel {
+    flex: 1;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    height: auto;
+    border-left: none;
+    border-top: 1px solid #1a3d2a;
+    padding: 18px 20px;
+    justify-content: flex-start;
+  }
+  .form-inner {
+    margin: 0;
+  }
+  .logo-row { margin-bottom: 14px; }
+  .tagline { margin-bottom: 14px; padding: 10px 14px; font-size: 11.5px; }
+  .login-form { gap: 10px; }
+  .input-wrap { height: 40px; }
+}
+
+/* ===== АДАПТИВ: очень маленький телефон ===== */
+@media (max-width: 380px) {
+  .pcb-panel { flex: 0 0 28%; }
+  .form-panel { padding: 14px 16px; }
+  .logo-text { font-size: 19px; }
+}
