@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
-const CheckListTemplate = require('../models/CheckListTemplate');
+const Material = require('../models/Material');
 
 function auth(req, res, next) {
   const header = req.headers.authorization;
@@ -20,28 +20,10 @@ function adminOnly(req, res, next) {
   next();
 }
 
-function canDelete(req, res, next) {
-  const allowed = ['admin', 'technologist', 'engineer'];
-  if (!allowed.includes(req.user.role)) {
-    return res.status(403).json({ message: 'Недостаточно прав для удаления' });
-  }
-  next();
-}
-
 router.get('/', auth, async (req, res) => {
   try {
-    const templates = await CheckListTemplate.find().sort({ createdAt: -1 });
-    res.json(templates);
-  } catch (err) {
-    res.status(500).json({ message: 'Ошибка сервера' });
-  }
-});
-
-router.get('/:id', auth, async (req, res) => {
-  try {
-    const template = await CheckListTemplate.findById(req.params.id);
-    if (!template) return res.status(404).json({ message: 'Не найдено' });
-    res.json(template);
+    const materials = await Material.find().sort({ createdAt: -1 });
+    res.json(materials);
   } catch (err) {
     res.status(500).json({ message: 'Ошибка сервера' });
   }
@@ -49,9 +31,10 @@ router.get('/:id', auth, async (req, res) => {
 
 router.post('/', auth, adminOnly, async (req, res) => {
   try {
-    const template = new CheckListTemplate(req.body);
-    await template.save();
-    res.status(201).json(template);
+    const { name, quantity, unit, supplier } = req.body;
+    const material = new Material({ name, quantity, unit, supplier });
+    await material.save();
+    res.status(201).json(material);
   } catch (err) {
     res.status(500).json({ message: 'Ошибка сервера', error: err.message });
   }
@@ -59,20 +42,16 @@ router.post('/', auth, adminOnly, async (req, res) => {
 
 router.patch('/:id', auth, adminOnly, async (req, res) => {
   try {
-    const dataToUpdate = {
-      ...req.body,
-      updatedBy: req.user.name || req.user.email || req.user.id,
-    };
-    const updated = await CheckListTemplate.findByIdAndUpdate(req.params.id, dataToUpdate, { new: true });
+    const updated = await Material.findByIdAndUpdate(req.params.id, req.body, { new: true });
     res.json(updated);
   } catch (err) {
     res.status(500).json({ message: 'Ошибка сервера', error: err.message });
   }
 });
 
-router.delete('/:id', auth, canDelete, async (req, res) => {
+router.delete('/:id', auth, adminOnly, async (req, res) => {
   try {
-    await CheckListTemplate.findByIdAndDelete(req.params.id);
+    await Material.findByIdAndDelete(req.params.id);
     res.json({ message: 'Удалено' });
   } catch (err) {
     res.status(500).json({ message: 'Ошибка сервера' });

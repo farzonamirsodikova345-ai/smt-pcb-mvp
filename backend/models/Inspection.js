@@ -11,6 +11,8 @@ const inspectionSchema = new mongoose.Schema({
   color: { type: String, default: '#2e7d32' },
   status: { type: String, enum: ['in_progress', 'completed'], default: 'in_progress' },
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  inspectionDate: { type: String, required: true }, // формат 'YYYY-MM-DD', день проверки
   answers: [answerSchema],
   completedAt: { type: Date, default: null },
 }, { timestamps: true });

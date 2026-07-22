@@ -31,6 +31,8 @@ app.use('/api/equipment', require('./routes/equipment'));
 app.use('/api/checklists', require('./routes/checklists'));
 app.use('/api/inspections', require('./routes/inspections'));
 app.use('/api/tasks', require('./routes/tasks'));
+app.use('/api/users', require('./routes/users'));  // ← ДОБАВЛЕНО
+app.use('/api/materials', require('./routes/materials'));
 
 // Ежедневная проверка просроченных задач — каждый день в 9:00 утра
 cron.schedule('*/1 * * * *', async () => {

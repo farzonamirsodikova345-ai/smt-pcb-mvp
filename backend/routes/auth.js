@@ -67,4 +67,42 @@ router.post('/login', async (req, res) => {
   }
 });
 
+// Создание сотрудника (только для admin)
+router.post('/create-employee', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(401).json({ message: 'Нет токена' });
+    }
+    const token = authHeader.split(' ')[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    if (decoded.role !== 'admin') {
+      return res.status(403).json({ message: 'Доступ запрещён' });
+    }
+
+    const { name, email, password, position } = req.body;
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: 'Пользователь уже существует' });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = new User({
+      name,
+      email,
+      password: hashedPassword,
+      role: 'employee',
+      position
+    });
+
+    await user.save();
+    res.status(201).json({ message: 'Сотрудник создан' });
+  } catch (err) {
+    res.status(500).json({ message: 'Ошибка сервера', error: err.message });
+  }
+});
+
 module.exports = router;

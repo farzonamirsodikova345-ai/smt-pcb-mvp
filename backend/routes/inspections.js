@@ -16,6 +16,15 @@ function auth(req, res, next) {
   }
 }
 
+function todayString() {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  const d = String(now.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+// Все проверки текущего пользователя
 router.get('/', auth, async (req, res) => {
   try {
     const inspections = await Inspection.find({ createdBy: req.user.id }).sort({ createdAt: -1 });
@@ -25,17 +34,21 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
-router.get('/:id', auth, async (req, res) => {
+// История всех проверок по конкретному шаблону (видно всем)
+router.get('/template/:templateId', auth, async (req, res) => {
   try {
-    const inspection = await Inspection.findById(req.params.id);
-    if (!inspection) return res.status(404).json({ message: 'Не найдено' });
-    res.json(inspection);
+    const inspections = await Inspection.find({ templateId: req.params.templateId })
+      .populate('createdBy', 'name')
+      .populate('updatedBy', 'name')
+      .sort({ createdAt: -1 });
+    res.json(inspections);
   } catch (err) {
     res.status(500).json({ message: 'Ошибка сервера' });
   }
 });
 
-router.post('/', auth, async (req, res) => {
+// Каждый клик — новая отдельная запись проверки
+router.post('/today', auth, async (req, res) => {
   try {
     const { templateId } = req.body;
     const template = await CheckListTemplate.findById(templateId);
@@ -46,6 +59,8 @@ router.post('/', auth, async (req, res) => {
       templateName: template.name,
       color: template.color,
       createdBy: req.user.id,
+      updatedBy: req.user.id,
+      inspectionDate: todayString(),
       answers: [],
     });
     await inspection.save();
@@ -61,9 +76,23 @@ router.post('/', auth, async (req, res) => {
   }
 });
 
+router.get('/:id', auth, async (req, res) => {
+  try {
+    const inspection = await Inspection.findById(req.params.id);
+    if (!inspection) return res.status(404).json({ message: 'Не найдено' });
+    res.json(inspection);
+  } catch (err) {
+    res.status(500).json({ message: 'Ошибка сервера' });
+  }
+});
+
 router.patch('/:id', auth, async (req, res) => {
   try {
-    const updated = await Inspection.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const updates = { ...req.body, updatedBy: req.user.id };
+    if (updates.status === 'completed') {
+      updates.completedAt = new Date();
+    }
+    const updated = await Inspection.findByIdAndUpdate(req.params.id, updates, { new: true });
     res.json(updated);
   } catch (err) {
     res.status(500).json({ message: 'Ошибка сервера', error: err.message });
